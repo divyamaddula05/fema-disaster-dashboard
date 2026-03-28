@@ -369,6 +369,11 @@ risk_df = pd.DataFrame({
 
 risk_df["risk_score"] = (risk_df["total"] * 0.5) + (risk_df["recent"] * 0.5)
 risk_df = risk_df.sort_values("risk_score", ascending=False)
+risk_df["risk_level"] = pd.qcut(
+    risk_df["risk_score"],
+    q=3,
+    labels=["Low", "Medium", "High"]
+)
 # ══════════════════════════════════════════════════════════════════════════════
 # HERO
 # ══════════════════════════════════════════════════════════════════════════════
@@ -608,6 +613,33 @@ with t1:
 # TAB 2 — GEOGRAPHIC
 # ─────────────────────────────────────────────────────────────────────────────
 with t2:
+    st.info("""
+        Risk Score is calculated using:
+        • 50% historical disaster frequency  
+        • 50% recent (last 10 years) activity  
+
+        This helps identify both long-term and emerging high-risk states.
+    """)
+    # st.dataframe(
+    #     risk_df[["risk_score", "risk_level"]].head(10)
+    # )
+    st.markdown("### 🧾 Top Risk States")
+
+    styled_df = risk_df[["risk_score", "risk_level"]] \
+        .sort_values("risk_score", ascending=False) \
+        .head(10)
+
+    def color_risk(val):
+        if val == "High":
+            return "color: red; font-weight: bold;"
+        elif val == "Medium":
+            return "color: orange; font-weight: bold;"
+        else:
+            return "color: green; font-weight: bold;"
+
+    st.dataframe(
+        styled_df.style.applymap(color_risk, subset=["risk_level"])
+    )
     st_counts = flt.groupby("state").size().reset_index(name="count")
 
     st.markdown('<div class="sec-head">08 — CHOROPLETH MAP — DECLARATIONS BY STATE</div>', unsafe_allow_html=True)
@@ -687,16 +719,28 @@ with t2:
     st.plotly_chart(fig12, use_container_width=True)
     st.markdown('<div class="sec-head">NEW — STATE RISK RANKING</div>', unsafe_allow_html=True)
 
-top_risk = risk_df.head(top_n).sort_values("risk_score")
+    top_risk = risk_df.head(top_n).sort_values("risk_score")
 
-fig_risk = go.Figure(go.Bar(
-    x=top_risk["risk_score"],
-    y=top_risk.index,
-    orientation="h"
-))
+    fig_risk = go.Figure(go.Bar(
+        x=top_risk["risk_score"],
+        y=top_risk.index,
+        orientation="h"
+    ))
 
-apply(fig_risk, h=350, title_text="Top High-Risk States")
-st.plotly_chart(fig_risk, use_container_width=True)
+    apply(fig_risk, h=350, title_text="Top High-Risk States")
+    st.plotly_chart(fig_risk, use_container_width=True)
+#     st.markdown('<div class="sec-head">NEW — STATE RISK RANKING</div>', unsafe_allow_html=True)
+
+# top_risk = risk_df.head(top_n).sort_values("risk_score")
+
+# fig_risk = go.Figure(go.Bar(
+#     x=top_risk["risk_score"],
+#     y=top_risk.index,
+#     orientation="h"
+# ))
+
+# apply(fig_risk, h=350, title_text="Top High-Risk States")
+# st.plotly_chart(fig_risk, use_container_width=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # TAB 3 — INCIDENT ANALYSIS
@@ -1051,7 +1095,7 @@ with t6:
 
     with col1:
         st.subheader("Top High-Risk States")
-        st.dataframe(risk_df.head(10))
+        # st.dataframe(risk_df.head(10))
 
     with col2:
         st.subheader("Peak Months")
@@ -1063,3 +1107,12 @@ with t6:
     - Prepare for seasonal peaks  
     - Monitor increasing trends  
     """)
+  
+
+
+
+
+
+
+
+
