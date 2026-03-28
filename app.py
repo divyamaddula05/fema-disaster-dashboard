@@ -383,7 +383,11 @@ st.markdown("""
   <div class="hero-sub">A Decision-Support Dashboard for Analyzing, Predicting, and Managing Disaster Risks</div>
   <div class="hero-line"></div>
 </div>
+            
 """, unsafe_allow_html=True)
+st.markdown("""
+### Transforming historical disaster data into actionable risk intelligence
+""")
 # ══════════════════════════════════════════════════════════════════════
 # GLOBAL CALCULATIONS (ADD HERE)
 # ══════════════════════════════════════════════════════════════════════
@@ -421,15 +425,26 @@ for col, (icon, val, label, sub, cls) in zip(cols, kpis):
         </div>""", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
-st.markdown("### 🔍 Key Insights")
+# st.markdown("### 🔍 Key Insights")
 
 avg_growth = yearly["yoy"].mean() if "yoy" in yearly else 0
 
+# st.write(f"""
+# - {top_state} is the most affected state  
+# - {top_inc} is the most frequent disaster  
+# - Peak year: {peak_yr}  
+# - Avg growth: {avg_growth:.2f}%  
+# """)
+st.markdown("### 🔍 Decision Insights")
+
 st.write(f"""
-- {top_state} is the most affected state  
-- {top_inc} is the most frequent disaster  
-- Peak year: {peak_yr}  
-- Avg growth: {avg_growth:.2f}%  
+• **{top_state}** consistently shows high disaster frequency, requiring prioritized resource allocation.  
+
+• **{top_inc}** dominates disaster occurrences, suggesting targeted mitigation strategies.  
+
+• Disaster activity peaked in **{peak_yr}**, indicating periods of extreme environmental stress.  
+
+• The trend shows **{'increasing' if avg_growth > 0 else 'stable'} disaster frequency**, highlighting the need for long-term disaster planning.  
 """)
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1089,17 +1104,12 @@ st.markdown(
     unsafe_allow_html=True,
 )
 with t6:
-    # st.markdown("### 🎯 Risk Insights")
+    top3 = risk_df[risk_df["risk_level"] == "High"] \
+    .sort_values("risk_score", ascending=False) \
+    .head(3).index.tolist()
 
-    # col1, col2 = st.columns(2)
-
-    # with col1:
-    #     st.subheader("Top High-Risk States")
-    #     # st.dataframe(risk_df.head(10))
-
-    # with col2:
-    #     st.subheader("Peak Months")
-    #     st.bar_chart(flt["month_name"].value_counts())
+    if top3:
+        st.error(f"⚠️ Immediate Attention Required: {', '.join(top3)}")
     with t6:
         st.markdown("### 🎯 Risk Insights")
 
