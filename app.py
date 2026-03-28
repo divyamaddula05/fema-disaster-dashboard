@@ -1089,17 +1089,34 @@ st.markdown(
     unsafe_allow_html=True,
 )
 with t6:
-    st.markdown("### 🎯 Risk Insights")
+    # st.markdown("### 🎯 Risk Insights")
 
-    col1, col2 = st.columns(2)
+    # col1, col2 = st.columns(2)
 
-    with col1:
-        st.subheader("Top High-Risk States")
-        # st.dataframe(risk_df.head(10))
+    # with col1:
+    #     st.subheader("Top High-Risk States")
+    #     # st.dataframe(risk_df.head(10))
 
-    with col2:
-        st.subheader("Peak Months")
-        st.bar_chart(flt["month_name"].value_counts())
+    # with col2:
+    #     st.subheader("Peak Months")
+    #     st.bar_chart(flt["month_name"].value_counts())
+    with t6:
+        st.markdown("### 🎯 Risk Insights")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.subheader("🔥 High Risk States")
+
+            high_risk = risk_df[risk_df["risk_level"] == "High"]
+
+            st.dataframe(
+                high_risk.sort_values("risk_score", ascending=False).head(10)
+            )
+
+        with col2:
+            st.subheader("Peak Months")
+            st.bar_chart(flt["month_name"].value_counts())
 
     st.subheader("Recommendations")
     st.write("""
