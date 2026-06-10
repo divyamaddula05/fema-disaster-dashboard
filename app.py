@@ -644,17 +644,28 @@ with t2:
         .sort_values("risk_score", ascending=False) \
         .head(10)
 
-    def color_risk(val):
-        if val == "High":
-            return "color: red; font-weight: bold;"
-        elif val == "Medium":
-            return "color: orange; font-weight: bold;"
-        else:
-            return "color: green; font-weight: bold;"
+    # def color_risk(val):
+    #     if val == "High":
+    #         return "color: red; font-weight: bold;"
+    #     elif val == "Medium":
+    #         return "color: orange; font-weight: bold;"
+    #     else:
+    #         return "color: green; font-weight: bold;"
 
-    st.dataframe(
-        styled_df.style.applymap(color_risk, subset=["risk_level"])
-    )
+    # st.dataframe(
+    #     styled_df.style.applymap(color_risk, subset=["risk_level"])
+    # )
+    styled_df = risk_df[["risk_score", "risk_level"]] \
+        .sort_values("risk_score", ascending=False) \
+        .head(10)
+
+    styled_df["risk_level"] = styled_df["risk_level"].replace({
+        "High": "🔴 High",
+        "Medium": "🟡 Medium",
+        "Low": "🟢 Low"
+    })
+
+    st.dataframe(styled_df)
     st_counts = flt.groupby("state").size().reset_index(name="count")
 
     st.markdown('<div class="sec-head">08 — CHOROPLETH MAP — DECLARATIONS BY STATE</div>', unsafe_allow_html=True)
@@ -1103,42 +1114,41 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True,
 )
+
 with t6:
+
+    st.markdown("### 🎯 Risk Insights")
+
     top3 = risk_df[risk_df["risk_level"] == "High"] \
-    .sort_values("risk_score", ascending=False) \
-    .head(3).index.tolist()
+        .sort_values("risk_score", ascending=False) \
+        .head(3).index.tolist()
 
     if top3:
         st.error(f"⚠️ Immediate Attention Required: {', '.join(top3)}")
-    with t6:
-        st.markdown("### 🎯 Risk Insights")
 
-        col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-        with col1:
-            st.subheader("🔥 High Risk States")
+    with col1:
+        st.subheader("🔥 High Risk States")
 
-            high_risk = risk_df[risk_df["risk_level"] == "High"]
+        high_risk = risk_df[risk_df["risk_level"] == "High"]
 
-            st.dataframe(
-                high_risk.sort_values("risk_score", ascending=False).head(10)
-            )
+        st.dataframe(
+            high_risk.sort_values("risk_score", ascending=False).head(10)
+        )
 
-        with col2:
-            st.subheader("Peak Months")
-            st.bar_chart(flt["month_name"].value_counts())
+    with col2:
+        st.subheader("📅 Peak Months")
+        st.bar_chart(flt["month_name"].value_counts())
 
     st.subheader("Recommendations")
+
     st.write("""
     - Focus on high-risk states  
-    - Prepare for seasonal peaks  
-    - Monitor increasing trends  
+    - Prepare for seasonal disaster peaks  
+    - Monitor increasing disaster trends  
+    - Strengthen long-term disaster preparedness strategies  
     """)
-  
-
-
-
-
 
 
 
