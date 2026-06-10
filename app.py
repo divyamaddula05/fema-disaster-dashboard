@@ -655,15 +655,16 @@ with t2:
     # st.dataframe(
     #     styled_df.style.applymap(color_risk, subset=["risk_level"])
     # )
-    styled_df = risk_df[["risk_score", "risk_level"]] \
-        .sort_values("risk_score", ascending=False) \
-        .head(10)
+    
+    styled_df["risk_level"] = styled_df["risk_level"].astype(str)
 
-    styled_df["risk_level"] = styled_df["risk_level"].replace({
+    styled_df["risk_level"] = styled_df["risk_level"].map({
         "High": "🔴 High",
         "Medium": "🟡 Medium",
         "Low": "🟢 Low"
     })
+
+
 
     st.dataframe(styled_df)
     st_counts = flt.groupby("state").size().reset_index(name="count")
